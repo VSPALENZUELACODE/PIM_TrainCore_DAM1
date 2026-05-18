@@ -1,0 +1,274 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap');
+  .tc*{margin:0;padding:0;box-sizing:border-box}
+  .tc{background:#080808;padding:2rem 0;display:flex;justify-content:center;font-family:'DM Sans',sans-serif}
+  .phone{width:390px;height:844px;background:#0f0f0f;border-radius:48px;overflow:hidden;position:relative;box-shadow:0 0 0 10px #1a1a1a,0 40px 80px rgba(0,0,0,.6);display:flex;flex-direction:column}
+  .notch{width:120px;height:34px;background:#0f0f0f;border-radius:0 0 20px 20px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:20}
+  .hdr{padding:52px 20px 12px;flex-shrink:0}
+  .hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+  .hdr-title{font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;letter-spacing:.05em}
+  .hdr-sub{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px}
+  .search{display:flex;align-items:center;gap:8px;background:#1c1c1c;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:10px 14px}
+  .search svg{flex-shrink:0;opacity:.35}
+  .search span{font-size:13px;color:rgba(255,255,255,.3)}
+
+  /* filtros */
+  .filters{display:flex;gap:8px;padding:0 20px 12px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+  .filters::-webkit-scrollbar{display:none}
+  .fchip{flex-shrink:0;padding:7px 14px;border-radius:100px;font-size:12px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.4);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+  .fchip.on{background:rgba(255,107,64,.15);border-color:rgba(255,107,64,.45);color:#ff6b40}
+
+  /* scroll */
+  .scroll{flex:1;overflow-y:auto;padding:0 20px 12px;scrollbar-width:none}
+  .scroll::-webkit-scrollbar{display:none}
+
+  /* rutina card */
+  .rcard{background:#1c1c1c;border-radius:20px;margin-bottom:12px;overflow:hidden;border:1px solid rgba(255,255,255,.05);cursor:pointer;transition:border-color .2s}
+  .rcard:hover{border-color:rgba(255,107,64,.25)}
+  .rcard.open{border-color:rgba(255,107,64,.35)}
+  .rcard-head{display:flex;align-items:center;gap:12px;padding:14px}
+  .rcard-ico{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .rcard-info{flex:1;min-width:0}
+  .rcard-name{font-size:14px;font-weight:500;color:#fff;margin-bottom:3px}
+  .rcard-meta{font-size:11px;color:rgba(255,255,255,.35)}
+  .rcard-tags{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+  .tag{font-size:10px;padding:3px 8px;border-radius:100px;font-weight:500}
+  .tag-muscle{background:rgba(255,107,64,.12);color:#ff6b40}
+  .tag-level{background:rgba(255,255,255,.07);color:rgba(255,255,255,.45)}
+  .tag-dur{background:rgba(255,255,255,.07);color:rgba(255,255,255,.45)}
+  .chevron{flex-shrink:0;transition:transform .25s}
+  .rcard.open .chevron{transform:rotate(180deg)}
+
+  /* ejercicios desplegados */
+  .ejercicios{display:none;border-top:1px solid rgba(255,255,255,.06)}
+  .rcard.open .ejercicios{display:block}
+  .ej-group{padding:12px 14px 0}
+  .ej-group-lbl{font-size:10px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+  .ej-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+  .ej-row:last-child{border-bottom:none}
+  .ej-num{width:22px;height:22px;border-radius:6px;background:rgba(255,107,64,.12);color:#ff6b40;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .ej-name{flex:1;font-size:13px;color:rgba(255,255,255,.8)}
+  .ej-detail{font-size:11px;color:rgba(255,255,255,.35);white-space:nowrap}
+  .ej-footer{padding:10px 14px 14px;display:flex;gap:8px;margin-top:4px}
+  .btn-start{flex:1;padding:11px;background:#ff6b40;border:none;border-radius:12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:opacity .2s}
+  .btn-start:hover{opacity:.9}
+  .btn-save{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+
+  /* bottom nav */
+  .bnav{display:flex;background:#141414;border-top:1px solid rgba(255,255,255,.07);padding:10px 0 28px;flex-shrink:0}
+  .ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
+  .ni svg{width:22px;height:22px}
+  .ni-lbl{font-size:10px;color:rgba(255,255,255,.3)}
+  .ni.on .ni-lbl{color:#ff6b40}
+  .dot{width:4px;height:4px;border-radius:50%;background:#ff6b40}
+</style>
+
+<div class="tc">
+<div class="phone">
+<div class="notch"></div>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <div>
+      <div class="hdr-title">Rutinas</div>
+      <div class="hdr-sub">6 rutinas disponibles</div>
+    </div>
+    <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,107,64,.15);border:1px solid rgba(255,107,64,.3);display:flex;align-items:center;justify-content:center">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M4 8h8M6 12h4" stroke="#ff6b40" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+  <div class="search">
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.5" cy="6.5" r="4.5" stroke="white" stroke-width="1.5"/><path d="M10 10l3 3" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <span>Buscar rutina…</span>
+  </div>
+</div>
+
+<!-- Filtros -->
+<div class="filters" id="filters">
+  <div class="fchip on" data-f="all">Todas</div>
+  <div class="fchip" data-f="pecho">Pecho</div>
+  <div class="fchip" data-f="espalda">Espalda</div>
+  <div class="fchip" data-f="piernas">Piernas</div>
+  <div class="fchip" data-f="hombros">Hombros</div>
+  <div class="fchip" data-f="brazos">Brazos</div>
+  <div class="fchip" data-f="abdomen">Abdomen</div>
+  <div class="fchip" data-f="fullbody">Full Body</div>
+</div>
+
+<div class="scroll" id="lista"></div>
+
+<div class="bnav">
+  <div class="ni"><svg viewBox="0 0 22 22" fill="none"><path d="M3 9.5L11 3l8 6.5V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" stroke="rgba(255,255,255,.3)" stroke-width="1.5" stroke-linejoin="round"/><rect x="8" y="13" width="6" height="7" rx="1" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/></svg><span class="ni-lbl">Inicio</span></div>
+  <div class="ni on"><svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="7" height="7" rx="2" stroke="#ff6b40" stroke-width="1.5"/><rect x="12" y="3" width="7" height="7" rx="2" stroke="#ff6b40" stroke-width="1.5"/><rect x="3" y="12" width="7" height="7" rx="2" stroke="#ff6b40" stroke-width="1.5"/><rect x="12" y="12" width="7" height="7" rx="2" stroke="#ff6b40" stroke-width="1.5"/></svg><span class="ni-lbl">Rutinas</span><div class="dot"></div></div>
+  <div class="ni"><svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/><path d="M11 7v4l3 3" stroke="rgba(255,255,255,.3)" stroke-width="1.5" stroke-linecap="round"/></svg><span class="ni-lbl">Progreso</span></div>
+  <div class="ni"><svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="3.5" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/><path d="M4 19c0-3.866 3.134-7 7-7h0c3.866 0 7 3.134 7 7" stroke="rgba(255,255,255,.3)" stroke-width="1.5" stroke-linecap="round"/></svg><span class="ni-lbl">Perfil</span></div>
+</div>
+</div>
+</div>
+
+<script>
+const rutinas = [
+  {
+    id:1, nombre:"Fuerza — Tren superior", ico:"💪", color:"rgba(255,107,64,.15)",
+    nivel:"Intermedio", duracion:"45 min", musculos:["pecho","hombros","brazos"],
+    grupos:[
+      { nombre:"Pecho", ejercicios:[
+        {n:"Press banca plano", det:"4×10 · 90s"},
+        {n:"Press inclinado mancuernas", det:"3×12 · 60s"},
+        {n:"Aperturas en polea", det:"3×15 · 45s"},
+      ]},
+      { nombre:"Hombros", ejercicios:[
+        {n:"Press militar barra", det:"4×8 · 90s"},
+        {n:"Elevaciones laterales", det:"3×15 · 45s"},
+      ]},
+      { nombre:"Brazos", ejercicios:[
+        {n:"Curl bíceps barra", det:"3×12 · 60s"},
+        {n:"Tríceps en polea", det:"3×12 · 60s"},
+      ]},
+    ]
+  },
+  {
+    id:2, nombre:"Piernas — Volumen", ico:"🦵", color:"rgba(100,160,255,.12)",
+    nivel:"Avanzado", duracion:"55 min", musculos:["piernas"],
+    grupos:[
+      { nombre:"Cuádriceps", ejercicios:[
+        {n:"Sentadilla barra", det:"5×8 · 2 min"},
+        {n:"Prensa 45°", det:"4×12 · 90s"},
+        {n:"Extensiones cuád.", det:"3×15 · 60s"},
+      ]},
+      { nombre:"Isquiotibiales", ejercicios:[
+        {n:"Peso muerto rumano", det:"4×10 · 90s"},
+        {n:"Curl femoral tumbado", det:"3×12 · 60s"},
+      ]},
+      { nombre:"Glúteos", ejercicios:[
+        {n:"Hip thrust barra", det:"4×12 · 90s"},
+        {n:"Patada de glúteo", det:"3×15 · 45s"},
+      ]},
+    ]
+  },
+  {
+    id:3, nombre:"Espalda — Amplitud", ico:"🔙", color:"rgba(80,200,160,.12)",
+    nivel:"Intermedio", duracion:"40 min", musculos:["espalda"],
+    grupos:[
+      { nombre:"Dorsales", ejercicios:[
+        {n:"Dominadas supinas", det:"4×8 · 90s"},
+        {n:"Jalón al pecho polea", det:"3×12 · 60s"},
+        {n:"Remo con barra", det:"4×10 · 90s"},
+      ]},
+      { nombre:"Trapecios", ejercicios:[
+        {n:"Encogimientos barra", det:"4×15 · 60s"},
+        {n:"Remo al cuello", det:"3×12 · 60s"},
+      ]},
+    ]
+  },
+  {
+    id:4, nombre:"Full Body — Funcional", ico:"⚡", color:"rgba(255,200,50,.1)",
+    nivel:"Principiante", duracion:"35 min", musculos:["fullbody"],
+    grupos:[
+      { nombre:"Cuerpo completo", ejercicios:[
+        {n:"Sentadilla con peso corporal", det:"3×15 · 45s"},
+        {n:"Flexiones", det:"3×12 · 45s"},
+        {n:"Zancadas alternas", det:"3×10 · 45s"},
+        {n:"Remo con mancuerna", det:"3×12 · 60s"},
+        {n:"Plancha isométrica", det:"3×30s · 30s"},
+      ]},
+    ]
+  },
+  {
+    id:5, nombre:"Abdomen — Core", ico:"🔥", color:"rgba(255,107,64,.12)",
+    nivel:"Todos", duracion:"20 min", musculos:["abdomen"],
+    grupos:[
+      { nombre:"Abdomen superior", ejercicios:[
+        {n:"Crunch clásico", det:"4×20 · 30s"},
+        {n:"Crunch con rotación", det:"3×15 · 30s"},
+      ]},
+      { nombre:"Abdomen inferior", ejercicios:[
+        {n:"Elevación de piernas", det:"4×15 · 45s"},
+        {n:"Bicicleta abdominal", det:"3×20 · 30s"},
+      ]},
+      { nombre:"Core estabilizador", ejercicios:[
+        {n:"Plancha frontal", det:"3×45s · 30s"},
+        {n:"Plancha lateral", det:"3×30s · 30s"},
+      ]},
+    ]
+  },
+  {
+    id:6, nombre:"Hombros — Definición", ico:"🎯", color:"rgba(160,100,255,.12)",
+    nivel:"Intermedio", duracion:"38 min", musculos:["hombros","brazos"],
+    grupos:[
+      { nombre:"Hombros", ejercicios:[
+        {n:"Press Arnold", det:"4×12 · 75s"},
+        {n:"Elevaciones frontales", det:"3×15 · 45s"},
+        {n:"Pájaro en banco", det:"3×15 · 45s"},
+      ]},
+      { nombre:"Brazos (acabado)", ejercicios:[
+        {n:"Curl martillo", det:"3×12 · 60s"},
+        {n:"Tríceps francés", det:"3×12 · 60s"},
+      ]},
+    ]
+  },
+];
+
+let filtroActivo = "all";
+
+function render(f){
+  const lista = document.getElementById('lista');
+  const visibles = f === "all" ? rutinas : rutinas.filter(r => r.musculos.includes(f));
+  lista.innerHTML = visibles.map(r => `
+    <div class="rcard" id="rc${r.id}" onclick="toggle(${r.id})">
+      <div class="rcard-head">
+        <div class="rcard-ico" style="background:${r.color}">${r.ico}</div>
+        <div class="rcard-info">
+          <div class="rcard-name">${r.nombre}</div>
+          <div class="rcard-meta">${r.grupos.reduce((a,g)=>a+g.ejercicios.length,0)} ejercicios</div>
+          <div class="rcard-tags">
+            ${r.musculos.map(m=>`<span class="tag tag-muscle">${m.charAt(0).toUpperCase()+m.slice(1)}</span>`).join('')}
+            <span class="tag tag-level">${r.nivel}</span>
+            <span class="tag tag-dur">⏱ ${r.duracion}</span>
+          </div>
+        </div>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M4 6l4 4 4-4" stroke="rgba(255,255,255,.35)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="ejercicios">
+        ${r.grupos.map(g => `
+          <div class="ej-group">
+            <div class="ej-group-lbl">${g.nombre}</div>
+            ${g.ejercicios.map((e,i)=>`
+              <div class="ej-row">
+                <div class="ej-num">${i+1}</div>
+                <div class="ej-name">${e.n}</div>
+                <div class="ej-detail">${e.det}</div>
+              </div>
+            `).join('')}
+          </div>
+        `).join('')}
+        <div class="ej-footer">
+          <button class="btn-start">▶ Iniciar rutina</button>
+          <div class="btn-save">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M8 11l-3-3M8 11l3-3" stroke="rgba(255,255,255,.5)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="rgba(255,255,255,.5)" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggle(id){
+  const el = document.getElementById('rc'+id);
+  el.classList.toggle('open');
+}
+
+document.getElementById('filters').addEventListener('click', e => {
+  const chip = e.target.closest('.fchip');
+  if(!chip) return;
+  document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('on'));
+  chip.classList.add('on');
+  filtroActivo = chip.dataset.f;
+  render(filtroActivo);
+});
+
+render("all");
+</script>
