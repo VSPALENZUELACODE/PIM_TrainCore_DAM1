@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TrainCore</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --accent: #ff6b40;
+  --accent2: #ff9a6c;
+  --bg: #080808;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --surface3: #222222;
+  --border: rgba(255,255,255,0.07);
+  --text: #ffffff;
+  --text2: rgba(255,255,255,0.55);
+  --text3: rgba(255,255,255,0.28);
+  --radius: 48px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body {
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', sans-serif;
+  padding: 2rem 0;
+}
+
+/* ── PHONE SHELL ── */
+.shell {
+  width: 390px;
+  height: 844px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 0 10px #1a1a1a, 0 50px 100px rgba(0,0,0,0.7);
+  display: flex;
+  flex-direction: column;
+}
+
+.notch {
+  width: 120px; height: 34px;
+  background: var(--surface);
+  border-radius: 0 0 20px 20px;
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  z-index: 50;
+}
+
+/* ── SCREENS ── */
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }
+.screen.active { opacity: 1; pointer-events: all; }
+
+/* ── SCROLL AREA ── */
+.scroll { flex: 1; overflow-y: auto; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ── STATUS BAR ── */
+.sbar {
+  padding: 14px 28px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  color: #fff; font-size: 12px; font-weight: 500;
+  flex-shrink: 0; z-index: 10; position: relative;
+}
+.sbar-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ══════════════════════════════════════
+   LANDING SCREEN
+══════════════════════════════════════ */
+#s-landing {
+  background: var(--surface);
+}
+#s-landing .bg-glow {
+  position: absolute; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 320px 420px at 85% 15%, rgba(255,80,30,0.2) 0%, transparent 70%),
+    radial-gradient(ellipse 200px 200px at 5% 85%, rgba(255,140,0,0.1) 0%, transparent 60%);
+}
+#s-landing .grid {
+  position: absolute; inset: 0; z-index: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+#s-landing .content { position: relative; z-index: 5; flex: 1; display: flex; flex-direction: column; padding-top: 20px; }
+
+.hero-wrap { position: relative; height: 320px; flex-shrink: 0; }
+.hero-svg { width: 100%; height: 100%; display: block; }
+.hero-fade { position: absolute; bottom: 0; left: 0; right: 0; height: 140px; background: linear-gradient(to bottom, transparent, var(--surface)); }
+.hero-badge {
+  position: absolute; top: 16px; left: 28px;
+  background: rgba(255,80,30,0.18); border: 1px solid rgba(255,80,30,0.45);
+  color: var(--accent); font-size: 10px; font-weight: 500; letter-spacing: 0.14em;
+  text-transform: uppercase; padding: 5px 12px; border-radius: 100px;
+}
+
+.land-body { padding: 0 28px 28px; margin-top: -30px; position: relative; z-index: 10; flex: 1; display: flex; flex-direction: column; }
+
+.land-logo { display: flex; align-items: center; gap: 8px; justify-content: flex-end; margin-bottom: 14px; }
+.land-logo span { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #fff; letter-spacing: 0.08em; }
+
+.land-tag {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 60px; line-height: 0.92; color: #fff;
+  letter-spacing: 0.01em; margin-bottom: 12px;
+}
+.land-tag em { color: var(--accent); font-style: normal; }
+
+.land-sub { font-size: 13px; color: var(--text2); line-height: 1.55; font-weight: 300; max-width: 270px; margin-bottom: 22px; }
+
+.stats-row {
+  display: flex; margin-bottom: 22px;
+  border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+}
+.stat { flex: 1; padding: 14px 10px; text-align: center; border-right: 1px solid var(--border); background: rgba(255,255,255,0.025); }
+.stat:last-child { border-right: none; }
+.stat-n { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #fff; line-height: 1; margin-bottom: 2px; }
+.stat-l { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
+
+.btn { width: 100%; padding: 17px; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+.btn-primary { background: var(--accent); color: #fff; margin-bottom: 10px; position: relative; overflow: hidden; }
+.btn-primary::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: rgba(255,255,255,0.25); border-radius: 14px 14px 0 0; }
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:active { transform: scale(0.98); }
+.btn-ghost { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text2); }
+.btn-ghost:hover { background: rgba(255,255,255,0.09); }
+
+.land-hint { text-align: center; margin-top: 14px; font-size: 12px; color: var(--text3); }
+.land-hint a { color: var(--accent); cursor: pointer; text-decoration: none; }
+
+/* ══════════════════════════════════════
+   LOGIN SCREEN
+══════════════════════════════════════ */
+#s-login { background: var(--surface); justify-content: flex-start; }
+#s-login .bg-glow {
+  position: absolute; inset: 0; z-index: 0;
+  background: radial-gradient(ellipse 400px 300px at 50% 0%, rgba(255,80,30,0.14) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.login-wrap { position: relative; z-index: 5; flex: 1; display: flex; flex-direction: column; padding: 0 28px 28px; }
+
+.login-logo-area {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 60px 0 32px;
+}
+.login-logo-area span { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #fff; letter-spacing: 0.08em; }
+
+.login-tabs {
+  display: flex; background: var(--surface2); border-radius: 12px; padding: 4px;
+  margin-bottom: 28px;
+}
+.tab-btn {
+  flex: 1; padding: 10px; border: none; background: transparent;
+  color: var(--text3); font-family: 'DM Sans', sans-serif; font-size: 13px;
+  font-weight: 500; cursor: pointer; border-radius: 9px; transition: all 0.2s;
+}
+.tab-btn.on { background: var(--surface3); color: #fff; }
+
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+.field input {
+  width: 100%; padding: 14px 16px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 14px;
+  outline: none; transition: border-color 0.2s;
+}
+.field input:focus { border-color: rgba(255,107,64,0.5); }
+.field input::placeholder { color: var(--text3); }
+
+.login-divider {
+  display: flex; align-items: center; gap: 12px; margin: 18px 0;
+  font-size: 11px; color: var(--text3);
+}
+.login-divider::before, .login-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+.social-row { display: flex; gap: 10px; margin-bottom: 20px; }
+.social-btn {
+  flex: 1; padding: 13px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 12px; color: var(--text2); font-family: 'DM Sans', sans-serif;
+  font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: background 0.2s;
+}
+.social-btn:hover { background: var(--surface3); }
+
+.forgot { text-align: right; font-size: 11px; color: var(--accent); cursor: pointer; margin-bottom: 20px; margin-top: -6px; }
+
+/* ══════════════════════════════════════
+   HOME SCREEN
+══════════════════════════════════════ */
+#s-home { background: var(--surface); }
+
+.home-hdr {
+  padding: 52px 22px 14px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-shrink: 0;
+}
+.hdr-greet { font-size: 11px; color: var(--text3); margin-bottom: 2px; }
+.hdr-name { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #fff; letter-spacing: 0.05em; }
+.avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #cc4a22);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; color: #fff; cursor: pointer;
+  flex-shrink: 0;
+}
+
+.sum-card {
+  background: var(--accent); border-radius: 20px; padding: 16px 18px;
+  margin-bottom: 16px; position: relative; overflow: hidden;
+}
+.sum-card::before {
+  content: ''; position: absolute; top: -60px; right: -60px;
+  width: 180px; height: 180px; background: rgba(255,255,255,0.06); border-radius: 50%;
+}
+.sum-card::after {
+  content: ''; position: absolute; bottom: -40px; left: -20px;
+  width: 120px; height: 120px; background: rgba(0,0,0,0.08); border-radius: 50%;
+}
+.sum-lbl { font-size: 9px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 2px; }
+.sum-date { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #fff; margin-bottom: 12px; }
+.sum-pills { display: flex; gap: 8px; position: relative; z-index: 1; }
+.pill { flex: 1; background: rgba(0,0,0,0.16); border-radius: 11px; padding: 9px 6px; text-align: center; }
+.pill-v { font-family: 'Bebas Neue', sans-serif; font-size: 17px; color: #fff; line-height: 1; }
+.pill-u { font-size: 9px; color: rgba(255,255,255,0.58); margin-top: 2px; }
+
+.sec-hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.sec-title { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: #fff; letter-spacing: 0.04em; }
+.sec-link { font-size: 11px; color: var(--accent); cursor: pointer; }
+
+.rutina-card {
+  background: var(--surface2); border-radius: 16px; padding: 13px;
+  margin-bottom: 9px; display: flex; align-items: center; gap: 11px;
+  border: 1px solid var(--border); cursor: pointer; transition: border-color 0.2s;
+}
+.rutina-card:hover { border-color: rgba(255,107,64,0.25); }
+.ru-ico {
+  width: 44px; height: 44px; border-radius: 11px; flex-shrink: 0;
+  background: rgba(255,107,64,0.12); border: 1px solid rgba(255,107,64,0.2);
+  display: flex; align-items: center; justify-content: center; font-size: 19px;
+}
+.ru-name { font-size: 13px; font-weight: 500; color: #fff; margin-bottom: 3px; }
+.ru-meta { font-size: 10px; color: var(--text3); }
+.ru-tag {
+  flex-shrink: 0; font-size: 9px; color: var(--accent); font-weight: 500;
+  background: rgba(255,107,64,0.12); padding: 4px 9px; border-radius: 100px;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+.prog-card {
+  background: var(--surface2); border-radius: 16px; padding: 14px;
+  margin-bottom: 14px; border: 1px solid var(--border);
+}
+.prog-sub { font-size: 10px; color: var(--text3); margin-bottom: 8px; }
+.bars { display: flex; gap: 5px; align-items: flex-end; height: 68px; }
+.bc { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bw { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+.b { width: 100%; border-radius: 4px 4px 0 0; }
+.bd { font-size: 8px; color: var(--text3); text-transform: uppercase; }
+.prog-nums { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.pn-v { font-family: 'Bebas Neue', sans-serif; font-size: 17px; color: #fff; text-align: center; }
+.pn-l { font-size: 8px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; text-align: center; }
+
+.retos-row { display: flex; gap: 9px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.retos-row::-webkit-scrollbar { display: none; }
+.reto { flex-shrink: 0; width: 130px; background: var(--surface2); border-radius: 14px; padding: 12px; border: 1px solid var(--border); }
+.reto.done { border-color: rgba(255,107,64,0.3); }
+.reto-ico { font-size: 20px; margin-bottom: 5px; }
+.reto-nm { font-size: 11px; font-weight: 500; color: #fff; line-height: 1.3; margin-bottom: 7px; }
+.reto-bar { height: 3px; background: rgba(255,255,255,0.07); border-radius: 3px; }
+.reto-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+.reto-pct { font-size: 9px; color: var(--text3); margin-top: 4px; }
+
+/* ══════════════════════════════════════
+   ROUTINES SCREEN
+══════════════════════════════════════ */
+#s-rutinas { background: var(--surface); }
+
+.rut-hdr { padding: 52px 20px 12px; flex-shrink: 0; }
+.rut-hdr-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.rut-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #fff; letter-spacing: 0.05em; }
+.rut-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.search-box { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: 11px; padding: 9px 13px; }
+.search-box span { font-size: 12px; color: var(--text3); }
+
+.filters { display: flex; gap: 7px; padding: 0 20px 12px; overflow-x: auto; flex-shrink: 0; scrollbar-width: none; }
+.filters::-webkit-scrollbar { display: none; }
+.fchip {
+  flex-shrink: 0; padding: 6px 13px; border-radius: 100px; font-size: 11px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text3); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+}
+.fchip.on { background: rgba(255,107,64,0.14); border-color: rgba(255,107,64,0.4); color: var(--accent); }
+
+.rcard { background: var(--surface2); border-radius: 18px; margin-bottom: 10px; overflow: hidden; border: 1px solid var(--border); cursor: pointer; transition: border-color 0.2s; }
+.rcard:hover { border-color: rgba(255,107,64,0.22); }
+.rcard.open { border-color: rgba(255,107,64,0.35); }
+.rcard-head { display: flex; align-items: center; gap: 11px; padding: 13px; }
+.rcard-ico { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; }
+.rcard-name { font-size: 13px; font-weight: 500; color: #fff; margin-bottom: 3px; }
+.rcard-meta { font-size: 10px; color: var(--text3); }
+.rcard-tags { display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
+.tag { font-size: 9px; padding: 3px 7px; border-radius: 100px; font-weight: 500; }
+.tag-m { background: rgba(255,107,64,0.12); color: var(--accent); }
+.tag-l { background: rgba(255,255,255,0.06); color: var(--text3); }
+.chevron { flex-shrink: 0; transition: transform 0.25s; }
+.rcard.open .chevron { transform: rotate(180deg); }
+
+.ejercicios { display: none; border-top: 1px solid var(--border); }
+.rcard.open .ejercicios { display: block; }
+.ej-group { padding: 10px 13px 0; }
+.ej-group-lbl { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 7px; }
+.ej-row { display: flex; align-items: center; gap: 9px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.ej-row:last-child { border-bottom: none; }
+.ej-num { width: 20px; height: 20px; border-radius: 6px; background: rgba(255,107,64,0.12); color: var(--accent); font-size: 10px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ej-name { flex: 1; font-size: 12px; color: rgba(255,255,255,0.78); }
+.ej-det { font-size: 10px; color: var(--text3); white-space: nowrap; }
+.ej-footer { padding: 10px 13px 13px; display: flex; gap: 7px; margin-top: 2px; }
+.btn-start { flex: 1; padding: 10px; background: var(--accent); border: none; border-radius: 11px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: opacity 0.2s; }
+.btn-start:hover { opacity: 0.88; }
+.btn-save { width: 38px; height: 38px; border-radius: 11px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+
+/* ══════════════════════════════════════
+   PROFILE SCREEN
+══════════════════════════════════════ */
+#s-profile { background: var(--surface); }
+
+.prof-hdr {
+  padding: 52px 22px 0;
+  flex-shrink: 0;
+  position: relative;
+}
+.prof-hdr-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.prof-hdr-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: #fff; letter-spacing: 0.05em; }
+.prof-settings {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--surface2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+
+.prof-card {
+  background: linear-gradient(135deg, #1e1005, #1a0f08);
+  border: 1px solid rgba(255,107,64,0.2);
+  border-radius: 20px; padding: 20px;
+  margin: 0 22px 18px;
+  display: flex; align-items: center; gap: 16px; position: relative; overflow: hidden;
+}
+.prof-card::before {
+  content: ''; position: absolute; top: -40px; right: -40px;
+  width: 140px; height: 140px;
+  background: radial-gradient(circle, rgba(255,107,64,0.15), transparent);
+  border-radius: 50%;
+}
+.prof-avatar {
+  width: 64px; height: 64px; border-radius: 20px;
+  background: linear-gradient(135deg, var(--accent), #cc4a22);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #fff;
+  flex-shrink: 0; position: relative; z-index: 1;
+}
+.prof-info { position: relative; z-index: 1; }
+.prof-name { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: #fff; letter-spacing: 0.04em; line-height: 1; margin-bottom: 4px; }
+.prof-handle { font-size: 12px; color: var(--text2); margin-bottom: 8px; }
+.prof-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,107,64,0.15); border: 1px solid rgba(255,107,64,0.3);
+  color: var(--accent); font-size: 10px; font-weight: 500; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 4px 10px; border-radius: 100px;
+}
+
+/* quick stats */
+.qstats {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 9px; margin: 0 22px 18px;
+}
+.qs-card {
+  background: var(--surface2); border-radius: 16px; padding: 14px;
+  border: 1px solid var(--border);
+}
+.qs-icon { font-size: 18px; margin-bottom: 6px; }
+.qs-val { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: #fff; line-height: 1; margin-bottom: 2px; }
+.qs-val span { font-size: 14px; color: var(--text3); font-family: 'DM Sans', sans-serif; font-weight: 300; }
+.qs-lbl { font-size: 10px; color: var(--text3); }
+.qs-change { font-size: 10px; color: #4cd97b; margin-top: 4px; }
+.qs-change.neg { color: #ff6b6b; }
+
+/* ring progress */
+.ring-section { margin: 0 22px 18px; }
+.ring-card { background: var(--surface2); border-radius: 16px; padding: 16px; border: 1px solid var(--border); }
+.ring-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.ring-title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: #fff; letter-spacing: 0.04em; }
+.ring-period { font-size: 10px; color: var(--accent); cursor: pointer; }
+.rings-row { display: flex; justify-content: space-around; align-items: center; }
+.ring-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ring-svg { transform: rotate(-90deg); }
+.ring-center { position: relative; }
+.ring-label { font-size: 11px; color: var(--text2); text-align: center; }
+.ring-val { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #fff; text-align: center; line-height: 1; }
+.ring-unit { font-size: 9px; color: var(--text3); }
+
+/* activity heatmap */
+.heat-section { margin: 0 22px 18px; }
+.heat-card { background: var(--surface2); border-radius: 16px; padding: 14px; border: 1px solid var(--border); }
+.heat-grid { display: flex; gap: 3px; margin-top: 12px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.heat-grid::-webkit-scrollbar { display: none; }
+.heat-col { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
+.heat-cell { width: 12px; height: 12px; border-radius: 3px; }
+.heat-months { display: flex; gap: 3px; margin-top: 6px; }
+.heat-m { font-size: 8px; color: var(--text3); }
+
+/* achievements */
+.ach-section { margin: 0 22px 18px; }
+.ach-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 9px; }
+.ach-item {
+  background: var(--surface2); border-radius: 14px; padding: 12px 8px;
+  border: 1px solid var(--border); text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.ach-item.unlocked { border-color: rgba(255,107,64,0.3); background: rgba(255,107,64,0.06); }
+.ach-item.locked { opacity: 0.45; }
+.ach-ico { font-size: 22px; }
+.ach-nm { font-size: 9px; color: var(--text2); font-weight: 500; line-height: 1.3; }
+.ach-nm.locked { color: var(--text3); }
+
+/* personal records */
+.pr-section { margin: 0 22px 18px; }
+.pr-list { display: flex; flex-direction: column; gap: 8px; }
+.pr-item {
+  background: var(--surface2); border-radius: 14px; padding: 13px 14px;
+  border: 1px solid var(--border); display: flex; align-items: center; gap: 12px;
+}
+.pr-ico { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,107,64,0.1); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.pr-exercise { font-size: 12px; font-weight: 500; color: #fff; margin-bottom: 2px; }
+.pr-date { font-size: 10px; color: var(--text3); }
+.pr-val { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--accent); white-space: nowrap; }
+.pr-unit { font-size: 10px; color: var(--text3); }
+
+/* logout btn */
+.logout-btn {
+  margin: 0 22px 28px; width: calc(100% - 44px);
+  padding: 14px; background: rgba(255,80,30,0.08); border: 1px solid rgba(255,80,30,0.2);
+  border-radius: 14px; color: var(--accent); font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s;
+}
+.logout-btn:hover { background: rgba(255,80,30,0.14); }
+
+/* ══════════════════════════════════════
+   BOTTOM NAV
+══════════════════════════════════════ */
+.bnav {
+  display: flex; background: #0e0e0e;
+  border-top: 1px solid var(--border);
+  padding: 10px 0 26px; flex-shrink: 0;
+}
+.ni { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+.ni svg { width: 21px; height: 21px; }
+.ni-lbl { font-size: 9px; color: var(--text3); }
+.ni.on .ni-lbl { color: var(--accent); }
+.nav-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+
+/* ══════════════════════════════════════
+   UTILITIES & ANIMATION
+══════════════════════════════════════ */
+.pad { padding: 0 20px; }
+.mt6 { margin-top: 6px; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+.screen.active .anim { animation: fadeUp 0.4s ease both; }
+.anim-1 { animation-delay: 0.05s; }
+.anim-2 { animation-delay: 0.12s; }
+.anim-3 { animation-delay: 0.19s; }
+.anim-4 { animation-delay: 0.26s; }
+.anim-5 { animation-delay: 0.33s; }
+
+/* toast */
+.toast {
+  position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: #222; border: 1px solid var(--border); color: #fff;
+  padding: 10px 18px; border-radius: 100px; font-size: 12px; white-space: nowrap;
+  opacity: 0; transition: all 0.3s; z-index: 999; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="notch"></div>
+
+  <!-- ══ LANDING ══ -->
+  <div class="screen active" id="s-landing">
+    <div class="bg-glow"></div>
+    <div class="grid"></div>
+    <div class="sbar" style="z-index:10;position:relative;">
+      <span>9:41</span>
+      <div class="sbar-icons">
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="3" width="2.5" height="8" fill="rgba(255,255,255,0.55)" rx="1"/><rect x="3.5" y="1.5" width="2.5" height="9.5" fill="rgba(255,255,255,0.55)" rx="1"/><rect x="7" y="0" width="2.5" height="11" fill="rgba(255,255,255,0.55)" rx="1"/><rect x="10.5" y="0" width="2.5" height="11" fill="rgba(255,255,255,0.15)" rx="1"/></svg>
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x=".5" y=".5" width="14" height="10" rx="2" stroke="rgba(255,255,255,0.38)" stroke-width="1"/><rect x="2" y="2" width="9" height="7" rx="1" fill="rgba(255,255,255,0.65)"/><path d="M15.5 3.5v4a2 2 0 0 0 0-4z" fill="rgba(255,255,255,0.38)"/></svg>
+      </div>
+    </div>
+    <div class="content">
+      <div class="hero-wrap">
+        <svg class="hero-svg" viewBox="0 0 390 320" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="hg" cx="60%" cy="30%"><stop offset="0%" stop-color="#ff6b40" stop-opacity="0.18"/><stop offset="100%" stop-color="#080808" stop-opacity="0"/></radialGradient>
+            <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff6b40"/><stop offset="100%" stop-color="#cc4a22"/></linearGradient>
+          </defs>
+          <rect width="390" height="320" fill="#0f0f0f"/>
+          <rect width="390" height="320" fill="url(#hg)"/>
+          <!-- grid -->
+          <line x1="0" y1="270" x2="390" y2="270" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+          <ellipse cx="195" cy="274" rx="85" ry="9" fill="rgba(0,0,0,0.45)"/>
+          <!-- runner figure -->
+          <circle cx="208" cy="115" r="21" fill="url(#lg1)" opacity="0.92"/>
+          <ellipse cx="198" cy="158" rx="21" ry="28" fill="url(#lg1)" opacity="0.88"/>
+          <path d="M186 158 Q148 182 140 218" stroke="#cc4a22" stroke-width="17" stroke-linecap="round" fill="none"/>
+          <path d="M212 152 Q255 130 268 112" stroke="#ff6b40" stroke-width="17" stroke-linecap="round" fill="none"/>
+          <path d="M190 187 Q178 236 153 276" stroke="#cc4a22" stroke-width="19" stroke-linecap="round" fill="none"/>
+          <path d="M202 192 Q238 242 259 278" stroke="#ff6b40" stroke-width="19" stroke-linecap="round" fill="none"/>
+          <ellipse cx="148" cy="278" rx="18" ry="8" fill="#cc4a22" transform="rotate(-15 148 278)"/>
+          <ellipse cx="262" cy="281" rx="18" ry="8" fill="#ff6b40" transform="rotate(10 262 281)"/>
+          <!-- speed lines -->
+          <line x1="92" y1="128" x2="138" y2="128" stroke="rgba(255,107,64,0.42)" stroke-width="2" stroke-linecap="round"/>
+          <line x1="82" y1="141" x2="134" y2="141" stroke="rgba(255,107,64,0.24)" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="92" y1="153" x2="136" y2="153" stroke="rgba(255,107,64,0.14)" stroke-width="1" stroke-linecap="round"/>
+          <!-- data cards -->
+          <rect x="248" y="80" width="116" height="58" rx="12" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+          <text x="261" y="104" font-family="Bebas Neue,sans-serif" font-size="21" fill="#fff">8.4 KM</text>
+          <text x="261" y="122" font-family="DM Sans,sans-serif" font-size="9.5" fill="rgba(255,255,255,0.38)" letter-spacing="0.1em">DISTANCIA HOY</text>
+          <circle cx="350" cy="96" r="4" fill="#ff6b40"/>
+          <rect x="22" y="196" width="98" height="54" rx="12" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+          <text x="34" y="215" font-family="DM Sans,sans-serif" font-size="9.5" fill="rgba(255,255,255,0.38)" letter-spacing="0.08em">FC MEDIA</text>
+          <text x="34" y="238" font-family="Bebas Neue,sans-serif" font-size="21" fill="#ff6b40">142 bpm</text>
+        </svg>
+        <div class="hero-fade"></div>
+        <div class="hero-badge">nueva temporada</div>
+      </div>
+
+      <div class="land-body">
+        <div class="land-logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="9" fill="#ff6b40"/><path d="M7 16L12 9l6 7 5-7" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 22l5-7 6 7 5-7" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"/></svg>
+          <span>TrainCore</span>
+        </div>
+
+        <div class="land-tag">ENTRENA<br>SIN<br><em>LÍMITES</em></div>
+        <p class="land-sub">Tu entrenador personal en el bolsillo. Rutinas, métricas y progreso real.</p>
+
+        <div class="stats-row">
+          <div class="stat"><div class="stat-n">12K+</div><div class="stat-l">usuarios</div></div>
+          <div class="stat"><div class="stat-n">300+</div><div class="stat-l">rutinas</div></div>
+          <div class="stat"><div class="stat-n">4.9★</div><div class="stat-l">valoración</div></div>
+        </div>
+
+        <button class="btn btn-primary" onclick="goTo('s-login')">Empezar gratis</button>
+        <button class="btn btn-ghost" onclick="goTo('s-login','explore')">Explorar la app</button>
+
+        <p class="land-hint">¿Ya tienes cuenta? <a onclick="goTo('s-login','login')">Inicia sesión</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ LOGIN ══ -->
+  <div class="screen" id="s-login">
+    <div class="bg-glow"></div>
+    <div class="sbar" style="position:relative;z-index:10;">
+      <span>9:41</span>
+      <div class="sbar-icons">
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="3" width="2.5" height="8" fill="rgba(255,255,255,0.55)" rx="1"/><rect x="3.5" y="1.5" width="2.5" height="9.5" fill="rgba(255,255,255,0.55)" rx="1"/><rect x="7" y="0" width="2.5" height="11" fill="rgba(255,255,255,0.55)" rx="1"/><rect x="10.5" y="0" width="2.5" height="11" fill="rgba(255,255,255,0.15)" rx="1"/></svg>
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x=".5" y=".5" width="14" height="10" rx="2" stroke="rgba(255,255,255,0.38)" stroke-width="1"/><rect x="2" y="2" width="9" height="7" rx="1" fill="rgba(255,255,255,0.65)"/><path d="M15.5 3.5v4a2 2 0 0 0 0-4z" fill="rgba(255,255,255,0.38)"/></svg>
+      </div>
+    </div>
+    <div class="login-wrap">
+      <div class="login-logo-area anim anim-1">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="10" fill="#ff6b40"/><path d="M8 18L14 10l6 8 5-8" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 24l6-8 6 8 5-8" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"/></svg>
+        <span>TrainCore</span>
+      </div>
+
+      <div class="login-tabs anim anim-2">
+        <button class="tab-btn on" id="tab-login" onclick="switchTab('login')">Iniciar sesión</button>
+        <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Registrarse</button>
+      </div>
+
+      <!-- Login form -->
+      <div id="form-login">
+        <div class="field anim anim-3">
+          <label>Correo electrónico</label>
+          <input type="email" id="login-email" placeholder="tu@email.com"/>
+        </div>
+        <div class="field anim anim-4">
+          <label>Contraseña</label>
+          <input type="password" id="login-pass" placeholder="••••••••"/>
+        </div>
+        <div class="forgot anim anim-4">¿Olvidaste tu contraseña?</div>
+        <button class="btn btn-primary anim anim-5" onclick="doLogin()">Entrar</button>
+        <div class="login-divider anim anim-5">o continúa con</div>
+        <div class="social-row anim anim-5">
+          <button class="social-btn" onclick="doLogin()">
+            <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Google
+          </button>
+          <button class="social-btn" onclick="doLogin()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            Apple
+          </button>
+        </div>
+      </div>
+
+      <!-- Register form -->
+      <div id="form-register" style="display:none">
+        <div class="field anim anim-3">
+          <label>Nombre completo</label>
+          <input type="text" placeholder="Alex Martínez"/>
+        </div>
+        <div class="field anim anim-3">
+          <label>Correo electrónico</label>
+          <input type="email" placeholder="tu@email.com"/>
+        </div>
+        <div class="field anim anim-4">
+          <label>Contraseña</label>
+          <input type="password" placeholder="Mín. 8 caracteres"/>
+        </div>
+        <div class="field anim anim-4">
+          <label>Confirmar contraseña</label>
+          <input type="password" placeholder="••••••••"/>
+        </div>
+        <button class="btn btn-primary anim anim-5" style="margin-top:4px" onclick="doLogin()">Crear cuenta</button>
+      </div>
+
+      <p style="text-align:center;margin-top:16px;font-size:11px;color:var(--text3);cursor:pointer;" onclick="goTo('s-landing')">← Volver al inicio</p>
+    </div>
+  </div>
+
+  <!-- ══ HOME ══ -->
+  <div class="screen" id="s-home">
+    <div class="home-hdr anim anim-1">
+      <div>
+        <div class="hdr-greet">Buenos días 👋</div>
+        <div class="hdr-name">ALEX MARTÍNEZ</div>
+      </div>
+      <div class="avatar" onclick="goTo('s-profile')">AM</div>
+    </div>
+    <div class="scroll" style="padding:0 20px 12px;">
+      <div class="sum-card anim anim-2">
+        <div class="sum-lbl">Resumen del día</div>
+        <div class="sum-date">Martes, 19 de mayo</div>
+        <div class="sum-pills">
+          <div class="pill"><div class="pill-v">1.840</div><div class="pill-u">🔥 kcal</div></div>
+          <div class="pill"><div class="pill-v">7.320</div><div class="pill-u">👟 pasos</div></div>
+          <div class="pill"><div class="pill-v">48</div><div class="pill-u">⏱ min</div></div>
+        </div>
+      </div>
+
+      <div class="sec-hd anim anim-3">
+        <div class="sec-title">Rutina de hoy</div>
+        <span class="sec-link" onclick="goTo('s-rutinas')">Ver todas</span>
+      </div>
+      <div class="rutina-card anim anim-3" onclick="goTo('s-rutinas')">
+        <div class="ru-ico">💪</div>
+        <div style="flex:1">
+          <div class="ru-name">Fuerza — Tren superior</div>
+          <div class="ru-meta">6 ejercicios · 45 min · Intermedio</div>
+        </div>
+        <div class="ru-tag">Hoy</div>
+      </div>
+      <div class="rutina-card anim anim-3" onclick="goTo('s-rutinas')">
+        <div class="ru-ico">🧘</div>
+        <div style="flex:1">
+          <div class="ru-name">Movilidad matutina</div>
+          <div class="ru-meta">8 ejercicios · 15 min · Fácil</div>
+        </div>
+        <div class="ru-tag" style="background:rgba(255,255,255,0.07);color:var(--text3);">Extra</div>
+      </div>
+
+      <div class="sec-hd mt6 anim anim-4">
+        <div class="sec-title">Esta semana</div>
+        <span class="sec-link">Detalle</span>
+      </div>
+      <div class="prog-card anim anim-4">
+        <div class="prog-sub">Minutos entrenados</div>
+        <div class="bars">
+          <div class="bc"><div class="bw"><div class="b" style="height:55%;background:rgba(255,255,255,0.1)"></div></div><div class="bd">L</div></div>
+          <div class="bc"><div class="bw"><div class="b" style="height:80%;background:rgba(255,255,255,0.1)"></div></div><div class="bd">M</div></div>
+          <div class="bc"><div class="bw"><div class="b" style="height:40%;background:rgba(255,255,255,0.1)"></div></div><div class="bd">X</div></div>
+          <div class="bc"><div class="bw"><div class="b" style="height:90%;background:rgba(255,255,255,0.1)"></div></div><div class="bd">J</div></div>
+          <div class="bc"><div class="bw"><div class="b" style="height:65%;background:rgba(255,255,255,0.1)"></div></div><div class="bd">V</div></div>
+          <div class="bc"><div class="bw"><div class="b" style="height:30%;background:rgba(255,255,255,0.1)"></div></div><div class="bd">S</div></div>
+          <div class="bc"><div class="bw"><div class="b" style="height:48%;background:var(--accent)"></div></div><div class="bd" style="color:var(--accent)">D</div></div>
+        </div>
+        <div class="prog-nums">
+          <div><div class="pn-v">5/7</div><div class="pn-l">días activos</div></div>
+          <div><div class="pn-v">312</div><div class="pn-l">min totales</div></div>
+          <div><div class="pn-v">8.420</div><div class="pn-l">kcal</div></div>
+        </div>
+      </div>
+
+      <div class="sec-hd anim anim-5">
+        <div class="sec-title">Retos activos</div>
+        <span class="sec-link">Ver todos</span>
+      </div>
+      <div class="retos-row anim anim-5">
+        <div class="reto done">
+          <div class="reto-ico">🏆</div>
+          <div class="reto-nm">7 días seguidos</div>
+          <div class="reto-bar"><div class="reto-fill" style="width:100%"></div></div>
+          <div class="reto-pct" style="color:var(--accent)">¡Completado!</div>
+        </div>
+        <div class="reto">
+          <div class="reto-ico">🔥</div>
+          <div class="reto-nm">10.000 kcal este mes</div>
+          <div class="reto-bar"><div class="reto-fill" style="width:72%"></div></div>
+          <div class="reto-pct">72% completado</div>
+        </div>
+        <div class="reto">
+          <div class="reto-ico">🏃</div>
+          <div class="reto-nm">Correr 50 km</div>
+          <div class="reto-bar"><div class="reto-fill" style="width:38%"></div></div>
+          <div class="reto-pct">38% completado</div>
+        </div>
+      </div>
+      <div style="height:12px"></div>
+    </div>
+    <div class="bnav">
+      <div class="ni on" onclick="goTo('s-home')">
+        <svg viewBox="0 0 22 22" fill="none"><path d="M3 9.5L11 3l8 6.5V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" stroke="#ff6b40" stroke-width="1.5" stroke-linejoin="round"/><rect x="8" y="13" width="6" height="7" rx="1" stroke="#ff6b40" stroke-width="1.5"/></svg>
+        <span class="ni-lbl">Inicio</span>
+        <div class="nav-dot"></div>
+      </div>
+      <div class="ni" onclick="goTo('s-rutinas')">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="7" height="7" rx="2" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><rect x="12" y="3" width="7" height="7" rx="2" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><rect x="3" y="12" width="7" height="7" rx="2" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><rect x="12" y="12" width="7" height="7" rx="2" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/></svg>
+        <span class="ni-lbl">Rutinas</span>
+      </div>
+      <div class="ni">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><path d="M11 7v4l3 3" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="ni-lbl">Progreso</span>
+      </div>
+      <div class="ni" onclick="goTo('s-profile')">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="3.5" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><path d="M4 19c0-3.866 3.134-7 7-7h0c3.866 0 7 3.134 7 7" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="ni-lbl">Perfil</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RUTINAS ══ -->
+  <div class="screen" id="s-rutinas">
+    <div class="rut-hdr">
+      <div class="rut-hdr-top">
+        <div>
+          <div class="rut-title">Rutinas</div>
+          <div class="rut-sub">6 rutinas disponibles</div>
+        </div>
+        <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,107,64,0.13);border:1px solid rgba(255,107,64,0.28);display:flex;align-items:center;justify-content:center">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 3.5h11M4 7.5h7M6 11.5h3" stroke="#ff6b40" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+      <div class="search-box">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="rgba(255,255,255,0.3)" stroke-width="1.4"/><path d="M9.5 9.5l2.5 2.5" stroke="rgba(255,255,255,0.3)" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span>Buscar rutina…</span>
+      </div>
+    </div>
+    <div class="filters" id="rut-filters">
+      <div class="fchip on" data-f="all">Todas</div>
+      <div class="fchip" data-f="pecho">Pecho</div>
+      <div class="fchip" data-f="espalda">Espalda</div>
+      <div class="fchip" data-f="piernas">Piernas</div>
+      <div class="fchip" data-f="hombros">Hombros</div>
+      <div class="fchip" data-f="brazos">Brazos</div>
+      <div class="fchip" data-f="abdomen">Abdomen</div>
+      <div class="fchip" data-f="fullbody">Full Body</div>
+    </div>
+    <div class="scroll" style="padding:0 20px 12px;" id="rut-lista"></div>
+    <div class="bnav">
+      <div class="ni" onclick="goTo('s-home')">
+        <svg viewBox="0 0 22 22" fill="none"><path d="M3 9.5L11 3l8 6.5V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linejoin="round"/><rect x="8" y="13" width="6" height="7" rx="1" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/></svg>
+        <span class="ni-lbl">Inicio</span>
+      </div>
+      <div class="ni on">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="7" height="7" rx="2" stroke="#ff6b40" stroke-width="1.5"/><rect x="12" y="3" width="7" height="7" rx="2" stroke="#ff6b40" stroke-width="1.5"/><rect x="3" y="12" width="7" height="7" rx="2" stroke="#ff6b40" stroke-width="1.5"/><rect x="12" y="12" width="7" height="7" rx="2" stroke="#ff6b40" stroke-width="1.5"/></svg>
+        <span class="ni-lbl">Rutinas</span>
+        <div class="nav-dot"></div>
+      </div>
+      <div class="ni">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><path d="M11 7v4l3 3" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="ni-lbl">Progreso</span>
+      </div>
+      <div class="ni" onclick="goTo('s-profile')">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="3.5" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><path d="M4 19c0-3.866 3.134-7 7-7h0c3.866 0 7 3.134 7 7" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="ni-lbl">Perfil</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PROFILE ══ -->
+  <div class="screen" id="s-profile">
+    <div class="prof-hdr">
+      <div class="prof-hdr-top">
+        <div class="prof-hdr-title">Mi Perfil</div>
+        <div class="prof-settings">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="rgba(255,255,255,0.5)" stroke-width="1.4"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="rgba(255,255,255,0.5)" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll">
+      <!-- Identity card -->
+      <div class="prof-card anim anim-1">
+        <div class="prof-avatar">AM</div>
+        <div class="prof-info">
+          <div class="prof-name">ALEX MARTÍNEZ</div>
+          <div class="prof-handle">@alexfit · Miembro desde ene 2024</div>
+          <div class="prof-badge">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1l1.12 2.27L9 3.64 7 5.59l.47 2.74L5 7.13 2.53 8.33 3 5.59 1 3.64l2.88-.37L5 1z" fill="#ff6b40"/></svg>
+            Pro · Nivel 14
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick stats grid -->
+      <div class="qstats anim anim-2">
+        <div class="qs-card">
+          <div class="qs-icon">🏋️</div>
+          <div class="qs-val">247 <span>entrenos</span></div>
+          <div class="qs-lbl">Total histórico</div>
+          <div class="qs-change">↑ +12 este mes</div>
+        </div>
+        <div class="qs-card">
+          <div class="qs-icon">⏱️</div>
+          <div class="qs-val">186 <span>h</span></div>
+          <div class="qs-lbl">Horas entrenadas</div>
+          <div class="qs-change">↑ +8h este mes</div>
+        </div>
+        <div class="qs-card">
+          <div class="qs-icon">🔥</div>
+          <div class="qs-val">94.2 <span>k</span></div>
+          <div class="qs-lbl">Kcal quemadas</div>
+          <div class="qs-change">↑ +2.1k esta semana</div>
+        </div>
+        <div class="qs-card">
+          <div class="qs-icon">📍</div>
+          <div class="qs-val">312 <span>km</span></div>
+          <div class="qs-lbl">Distancia total</div>
+          <div class="qs-change neg">↓ -5km vs mes ant.</div>
+        </div>
+      </div>
+
+      <!-- Activity rings -->
+      <div class="ring-section anim anim-2">
+        <div class="ring-card">
+          <div class="ring-top">
+            <div class="ring-title">Objetivos de hoy</div>
+            <div class="ring-period">Esta semana</div>
+          </div>
+          <div class="rings-row">
+            <div class="ring-item">
+              <div style="position:relative;width:72px;height:72px;">
+                <svg class="ring-svg" width="72" height="72" viewBox="0 0 72 72">
+                  <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(255,107,64,0.12)" stroke-width="8"/>
+                  <circle cx="36" cy="36" r="28" fill="none" stroke="#ff6b40" stroke-width="8" stroke-linecap="round" stroke-dasharray="175.9" stroke-dashoffset="44"/>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                  <div class="ring-val">75%</div>
+                </div>
+              </div>
+              <div class="ring-label">Movimiento<br><span style="color:var(--accent)">1.840 / 2.500</span></div>
+              <div class="ring-unit">kcal</div>
+            </div>
+            <div class="ring-item">
+              <div style="position:relative;width:72px;height:72px;">
+                <svg class="ring-svg" width="72" height="72" viewBox="0 0 72 72">
+                  <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(76,217,123,0.12)" stroke-width="8"/>
+                  <circle cx="36" cy="36" r="28" fill="none" stroke="#4cd97b" stroke-width="8" stroke-linecap="round" stroke-dasharray="175.9" stroke-dashoffset="70"/>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                  <div class="ring-val" style="color:#4cd97b">60%</div>
+                </div>
+              </div>
+              <div class="ring-label">Ejercicio<br><span style="color:#4cd97b">48 / 80</span></div>
+              <div class="ring-unit">minutos</div>
+            </div>
+            <div class="ring-item">
+              <div style="position:relative;width:72px;height:72px;">
+                <svg class="ring-svg" width="72" height="72" viewBox="0 0 72 72">
+                  <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(100,180,255,0.12)" stroke-width="8"/>
+                  <circle cx="36" cy="36" r="28" fill="none" stroke="#64b4ff" stroke-width="8" stroke-linecap="round" stroke-dasharray="175.9" stroke-dashoffset="26"/>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                  <div class="ring-val" style="color:#64b4ff">85%</div>
+                </div>
+              </div>
+              <div class="ring-label">Pasos<br><span style="color:#64b4ff">7.320 / 8.500</span></div>
+              <div class="ring-unit">pasos</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Heatmap -->
+      <div class="heat-section anim anim-3">
+        <div class="heat-card">
+          <div class="ring-top">
+            <div class="ring-title">Actividad anual</div>
+            <div class="ring-period" style="font-size:10px;color:var(--text3);">2024–2025</div>
+          </div>
+          <div class="heat-grid" id="heatmap"></div>
+          <div style="display:flex;align-items:center;gap:5px;margin-top:10px;justify-content:flex-end;">
+            <span style="font-size:9px;color:var(--text3);">Menos</span>
+            <div style="width:10px;height:10px;border-radius:2px;background:rgba(255,107,64,0.1)"></div>
+            <div style="width:10px;height:10px;border-radius:2px;background:rgba(255,107,64,0.3)"></div>
+            <div style="width:10px;height:10px;border-radius:2px;background:rgba(255,107,64,0.55)"></div>
+            <div style="width:10px;height:10px;border-radius:2px;background:#ff6b40"></div>
+            <span style="font-size:9px;color:var(--text3);">Más</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Achievements -->
+      <div class="ach-section anim anim-3">
+        <div class="sec-hd" style="margin-bottom:10px;"><div class="sec-title">Logros</div><span class="sec-link">Ver todos (24)</span></div>
+        <div class="ach-grid">
+          <div class="ach-item unlocked"><div class="ach-ico">🔥</div><div class="ach-nm">Racha de 7 días</div></div>
+          <div class="ach-item unlocked"><div class="ach-ico">💯</div><div class="ach-nm">100 entrenos</div></div>
+          <div class="ach-item unlocked"><div class="ach-ico">🏃</div><div class="ach-nm">50 km corridos</div></div>
+          <div class="ach-item unlocked"><div class="ach-ico">⚡</div><div class="ach-nm">PR personal</div></div>
+          <div class="ach-item unlocked"><div class="ach-ico">🌅</div><div class="ach-nm">Madrugador</div></div>
+          <div class="ach-item locked"><div class="ach-ico">🏆</div><div class="ach-nm ach-nm locked">365 días</div></div>
+        </div>
+      </div>
+
+      <!-- Personal Records -->
+      <div class="pr-section anim anim-4">
+        <div class="sec-hd" style="margin-bottom:10px;"><div class="sec-title">Récords personales</div><span class="sec-link">Historial</span></div>
+        <div class="pr-list">
+          <div class="pr-item">
+            <div class="pr-ico">🏋️</div>
+            <div style="flex:1">
+              <div class="pr-exercise">Press de banca</div>
+              <div class="pr-date">15 mayo 2025</div>
+            </div>
+            <div style="text-align:right"><div class="pr-val">102.5</div><div class="pr-unit">kg</div></div>
+          </div>
+          <div class="pr-item">
+            <div class="pr-ico">🦵</div>
+            <div style="flex:1">
+              <div class="pr-exercise">Sentadilla</div>
+              <div class="pr-date">3 mayo 2025</div>
+            </div>
+            <div style="text-align:right"><div class="pr-val">145</div><div class="pr-unit">kg</div></div>
+          </div>
+          <div class="pr-item">
+            <div class="pr-ico">🔙</div>
+            <div style="flex:1">
+              <div class="pr-exercise">Peso muerto</div>
+              <div class="pr-date">28 abr 2025</div>
+            </div>
+            <div style="text-align:right"><div class="pr-val">175</div><div class="pr-unit">kg</div></div>
+          </div>
+          <div class="pr-item">
+            <div class="pr-ico">🏃</div>
+            <div style="flex:1">
+              <div class="pr-exercise">5 km carrera</div>
+              <div class="pr-date">10 abr 2025</div>
+            </div>
+            <div style="text-align:right"><div class="pr-val">24:38</div><div class="pr-unit">min</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Logout -->
+      <button class="logout-btn anim anim-5" onclick="doLogout()">Cerrar sesión</button>
+    </div>
+
+    <div class="bnav">
+      <div class="ni" onclick="goTo('s-home')">
+        <svg viewBox="0 0 22 22" fill="none"><path d="M3 9.5L11 3l8 6.5V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linejoin="round"/><rect x="8" y="13" width="6" height="7" rx="1" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/></svg>
+        <span class="ni-lbl">Inicio</span>
+      </div>
+      <div class="ni" onclick="goTo('s-rutinas')">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="7" height="7" rx="2" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><rect x="12" y="3" width="7" height="7" rx="2" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><rect x="3" y="12" width="7" height="7" rx="2" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><rect x="12" y="12" width="7" height="7" rx="2" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/></svg>
+        <span class="ni-lbl">Rutinas</span>
+      </div>
+      <div class="ni">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><path d="M11 7v4l3 3" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="ni-lbl">Progreso</span>
+      </div>
+      <div class="ni on">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="3.5" stroke="#ff6b40" stroke-width="1.5"/><path d="M4 19c0-3.866 3.134-7 7-7h0c3.866 0 7 3.134 7 7" stroke="#ff6b40" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="ni-lbl">Perfil</span>
+        <div class="nav-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ── NAVIGATION ── */
+function goTo(id, hint) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(id);
+  target.classList.add('active');
+  // re-trigger animations
+  target.querySelectorAll('.anim').forEach(el => {
+    el.style.animation = 'none';
+    el.offsetHeight;
+    el.style.animation = '';
+  });
+  if (id === 'login' && hint === 'login') switchTab('login');
+  if (id === 's-rutinas') renderRutinas('all');
+}
+
+/* ── LOGIN TABS ── */
+function switchTab(t) {
+  document.getElementById('tab-login').classList.toggle('on', t === 'login');
+  document.getElementById('tab-register').classList.toggle('on', t === 'register');
+  document.getElementById('form-login').style.display = t === 'login' ? '' : 'none';
+  document.getElementById('form-register').style.display = t === 'register' ? '' : 'none';
+}
+
+/* ── AUTH ── */
+function doLogin() {
+  showToast('✓ Bienvenido, Alex!');
+  setTimeout(() => goTo('s-home'), 700);
+}
+
+function doLogout() {
+  showToast('Sesión cerrada');
+  setTimeout(() => goTo('s-landing'), 700);
+}
+
+/* ── TOAST ── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ── ROUTINES DATA ── */
+const rutinas = [
+  { id:1, nombre:"Fuerza — Tren superior", ico:"💪", color:"rgba(255,107,64,.15)", nivel:"Intermedio", duracion:"45 min", musculos:["pecho","hombros","brazos"],
+    grupos:[{nombre:"Pecho",ejercicios:[{n:"Press banca plano",det:"4×10 · 90s"},{n:"Press inclinado mancuernas",det:"3×12 · 60s"},{n:"Aperturas en polea",det:"3×15 · 45s"}]},{nombre:"Hombros",ejercicios:[{n:"Press militar barra",det:"4×8 · 90s"},{n:"Elevaciones laterales",det:"3×15 · 45s"}]},{nombre:"Brazos",ejercicios:[{n:"Curl bíceps barra",det:"3×12 · 60s"},{n:"Tríceps en polea",det:"3×12 · 60s"}]}]},
+  { id:2, nombre:"Piernas — Volumen", ico:"🦵", color:"rgba(100,160,255,.12)", nivel:"Avanzado", duracion:"55 min", musculos:["piernas"],
+    grupos:[{nombre:"Cuádriceps",ejercicios:[{n:"Sentadilla barra",det:"5×8 · 2 min"},{n:"Prensa 45°",det:"4×12 · 90s"},{n:"Extensiones cuád.",det:"3×15 · 60s"}]},{nombre:"Isquiotibiales",ejercicios:[{n:"Peso muerto rumano",det:"4×10 · 90s"},{n:"Curl femoral tumbado",det:"3×12 · 60s"}]},{nombre:"Glúteos",ejercicios:[{n:"Hip thrust barra",det:"4×12 · 90s"},{n:"Patada de glúteo",det:"3×15 · 45s"}]}]},
+  { id:3, nombre:"Espalda — Amplitud", ico:"🔙", color:"rgba(80,200,160,.12)", nivel:"Intermedio", duracion:"40 min", musculos:["espalda"],
+    grupos:[{nombre:"Dorsales",ejercicios:[{n:"Dominadas supinas",det:"4×8 · 90s"},{n:"Jalón al pecho polea",det:"3×12 · 60s"},{n:"Remo con barra",det:"4×10 · 90s"}]},{nombre:"Trapecios",ejercicios:[{n:"Encogimientos barra",det:"4×15 · 60s"},{n:"Remo al cuello",det:"3×12 · 60s"}]}]},
+  { id:4, nombre:"Full Body — Funcional", ico:"⚡", color:"rgba(255,200,50,.1)", nivel:"Principiante", duracion:"35 min", musculos:["fullbody"],
+    grupos:[{nombre:"Cuerpo completo",ejercicios:[{n:"Sentadilla peso corporal",det:"3×15 · 45s"},{n:"Flexiones",det:"3×12 · 45s"},{n:"Zancadas alternas",det:"3×10 · 45s"},{n:"Remo con mancuerna",det:"3×12 · 60s"},{n:"Plancha isométrica",det:"3×30s · 30s"}]}]},
+  { id:5, nombre:"Abdomen — Core", ico:"🔥", color:"rgba(255,107,64,.12)", nivel:"Todos", duracion:"20 min", musculos:["abdomen"],
+    grupos:[{nombre:"Abdomen superior",ejercicios:[{n:"Crunch clásico",det:"4×20 · 30s"},{n:"Crunch con rotación",det:"3×15 · 30s"}]},{nombre:"Abdomen inferior",ejercicios:[{n:"Elevación de piernas",det:"4×15 · 45s"},{n:"Bicicleta abdominal",det:"3×20 · 30s"}]},{nombre:"Core estabilizador",ejercicios:[{n:"Plancha frontal",det:"3×45s · 30s"},{n:"Plancha lateral",det:"3×30s · 30s"}]}]},
+  { id:6, nombre:"Hombros — Definición", ico:"🎯", color:"rgba(160,100,255,.12)", nivel:"Intermedio", duracion:"38 min", musculos:["hombros","brazos"],
+    grupos:[{nombre:"Hombros",ejercicios:[{n:"Press Arnold",det:"4×12 · 75s"},{n:"Elevaciones frontales",det:"3×15 · 45s"},{n:"Pájaro en banco",det:"3×15 · 45s"}]},{nombre:"Brazos (acabado)",ejercicios:[{n:"Curl martillo",det:"3×12 · 60s"},{n:"Tríceps francés",det:"3×12 · 60s"}]}]},
+];
+
+function renderRutinas(f) {
+  const lista = document.getElementById('rut-lista');
+  const vis = f === 'all' ? rutinas : rutinas.filter(r => r.musculos.includes(f));
+  lista.innerHTML = vis.map(r => `
+    <div class="rcard" id="rc${r.id}" onclick="toggleRut(${r.id})">
+      <div class="rcard-head">
+        <div class="rcard-ico" style="background:${r.color}">${r.ico}</div>
+        <div style="flex:1;min-width:0">
+          <div class="rcard-name">${r.nombre}</div>
+          <div class="rcard-meta">${r.grupos.reduce((a,g)=>a+g.ejercicios.length,0)} ejercicios</div>
+          <div class="rcard-tags">
+            ${r.musculos.map(m=>`<span class="tag tag-m">${m.charAt(0).toUpperCase()+m.slice(1)}</span>`).join('')}
+            <span class="tag tag-l">${r.nivel}</span>
+            <span class="tag tag-l">⏱ ${r.duracion}</span>
+          </div>
+        </div>
+        <svg class="chevron" width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3.5 5.5l4 4 4-4" stroke="rgba(255,255,255,0.35)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="ejercicios">
+        ${r.grupos.map(g=>`
+          <div class="ej-group">
+            <div class="ej-group-lbl">${g.nombre}</div>
+            ${g.ejercicios.map((e,i)=>`
+              <div class="ej-row">
+                <div class="ej-num">${i+1}</div>
+                <div class="ej-name">${e.n}</div>
+                <div class="ej-det">${e.det}</div>
+              </div>
+            `).join('')}
+          </div>
+        `).join('')}
+        <div class="ej-footer">
+          <button class="btn-start" onclick="event.stopPropagation();showToast('▶ Iniciando ${r.nombre}...')">▶ Iniciar rutina</button>
+          <div class="btn-save" onclick="event.stopPropagation();showToast('Rutina guardada ✓')">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 2v8M7.5 10L5 7.5M7.5 10L10 7.5" stroke="rgba(255,255,255,0.5)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 12.5h10" stroke="rgba(255,255,255,0.5)" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleRut(id) {
+  document.getElementById('rc'+id).classList.toggle('open');
+}
+
+document.getElementById('rut-filters').addEventListener('click', e => {
+  const chip = e.target.closest('.fchip');
+  if (!chip) return;
+  document.querySelectorAll('.fchip').forEach(c => c.classList.remove('on'));
+  chip.classList.add('on');
+  renderRutinas(chip.dataset.f);
+});
+
+/* ── HEATMAP ── */
+function buildHeatmap() {
+  const el = document.getElementById('heatmap');
+  const weeks = 26;
+  let html = '';
+  for (let w = 0; w < weeks; w++) {
+    html += '<div class="heat-col">';
+    for (let d = 0; d < 7; d++) {
+      const r = Math.random();
+      let bg;
+      if (r < 0.35) bg = 'rgba(255,255,255,0.04)';
+      else if (r < 0.55) bg = 'rgba(255,107,64,0.18)';
+      else if (r < 0.75) bg = 'rgba(255,107,64,0.38)';
+      else if (r < 0.9) bg = 'rgba(255,107,64,0.62)';
+      else bg = '#ff6b40';
+      html += `<div class="heat-cell" style="background:${bg}"></div>`;
+    }
+    html += '</div>';
+  }
+  el.innerHTML = html;
+}
+
+buildHeatmap();
+renderRutinas('all');
+</script>
+</body>
+</html>
